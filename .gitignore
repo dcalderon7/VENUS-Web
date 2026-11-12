@@ -1,0 +1,14 @@
+.env.production
+dist
+
+# Configuracion local
+.env
+.env.*
+!.env.example
+
+# Archivos generados
+node_modules/
+dist/
+coverage/
+*.log
+
