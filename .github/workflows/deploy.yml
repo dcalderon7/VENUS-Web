@@ -1,0 +1,49 @@
+﻿name: Deploy VENUS Web
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout VENUS-Web
+        uses: actions/checkout@v4
+        with:
+          path: VenusWeb
+
+      - name: Checkout VENUS Worker
+        uses: actions/checkout@v4
+        with:
+          repository: dcalderon7/VENUS
+          ref: main
+          path: Venus
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: VenusWeb/package-lock.json
+
+      - name: Install dependencies
+        working-directory: VenusWeb
+        run: npm ci
+
+      - name: Build VENUS Web
+        working-directory: VenusWeb
+        run: npm run build
+
+      - name: Deploy to Cloudflare
+        working-directory: Venus/cloudflare-worker
+        run: npx --yes wrangler@latest deploy --config wrangler.jsonc
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
