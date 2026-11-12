@@ -37,9 +37,11 @@ jobs:
         working-directory: VenusWeb
         run: npm ci
 
-      - name: Build VENUS Web
+       - name: Build VENUS Web
         working-directory: VenusWeb
         run: npm run build
+        env:
+          VITE_API_URL: https://venus.venus1.workers.dev
 
       - name: Deploy to Cloudflare
         working-directory: Venus/cloudflare-worker
