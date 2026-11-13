@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { AlertCircle, Film, Maximize2, Play, Volume2, X } from 'lucide-react'
 import { getStreamUrl } from '../services/api'
+import { useAuth } from '../context/AuthContext'
 
 export function VideoPlayerModal({ isOpen, onClose, media, title, posterPath }) {
+  const { token } = useAuth()
   const videoRef = useRef(null)
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -14,9 +16,9 @@ export function VideoPlayerModal({ isOpen, onClose, media, title, posterPath }) 
 
   if (!isOpen || !media) return null
 
-  const mediaId = media.id || media.tmdb_id || media.tmdbId
-  const streamUrl = getStreamUrl(mediaId)
-  const displayTitle = title || media.display_title || media.file_name || `Película #${mediaId}`
+  const mediaId = media.id || media.media_id
+  const streamUrl = mediaId ? getStreamUrl(mediaId, token) : ''
+  const displayTitle = title || media.display_title || media.file_name || `Película #${mediaId || 'desconocida'}`
 
   function handleFullscreen() {
     if (videoRef.current) {

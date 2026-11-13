@@ -94,7 +94,12 @@ export function CatalogPage() {
   }, [loadCatalog])
 
   const handlePlayMovie = (movie, media) => {
-    const mediaObj = media || availabilityMap[String(movie.id)] || { tmdb_id: movie.id, display_title: movie.title }
+    const mediaObj = media || availabilityMap[String(movie.id)]
+    if (!mediaObj || !mediaObj.id) {
+      setSelectedMovie(movie)
+      setDetailsOpen(true)
+      return
+    }
     setCurrentPlaybackMedia(mediaObj)
     setPlayerOpen(true)
   }

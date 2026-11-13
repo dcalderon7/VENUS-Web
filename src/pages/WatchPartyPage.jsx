@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
+  AlertCircle,
   Film,
   KeyRound,
   Lock,
@@ -39,6 +40,13 @@ export function WatchPartyPage() {
   const videoRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [tmdbDetails, setTmdbDetails] = useState(null)
+  const [videoLoading, setVideoLoading] = useState(true)
+  const [videoError, setVideoError] = useState(false)
+
+  useEffect(() => {
+    setVideoLoading(true)
+    setVideoError(false)
+  }, [activeRoom])
 
   // Load available library movies for Watch Party creation
   useEffect(() => {
@@ -139,7 +147,7 @@ export function WatchPartyPage() {
   }
 
   if (activeRoom) {
-    const streamUrl = getStreamUrl(activeRoom.media.id)
+    const streamUrl = activeRoom?.media?.id ? getStreamUrl(activeRoom.media.id, token) : ''
     const displayTitle = activeRoom.media.display_title || tmdbDetails?.title || activeRoom.media.file_name || 'Película Watch Party'
     const posterUrl = tmdbDetails ? getTmdbImageUrl(tmdbDetails.poster_path) : null
 
@@ -162,14 +170,38 @@ export function WatchPartyPage() {
           {/* Main Player */}
           <div className="watchparty-main-col">
             <div className="player-wrapper watchparty-player-wrap">
+              {videoLoading && !videoError && (
+                <div className="player-overlay loading-overlay">
+                  <span className="loading-spinner" />
+                  <p>Cargando transmisión de la Watch Party...</p>
+                </div>
+              )}
+
+              {videoError && (
+                <div className="player-overlay error-overlay">
+                  <AlertCircle size={42} className="text-danger" />
+                  <h4>No se pudo reproducir el video en la sala</h4>
+                  <p>Verifica que el servidor esté disponible y que el archivo multimedia exista.</p>
+                  <button className="button button--primary" onClick={() => { setVideoError(false); setVideoLoading(true); if (videoRef.current) videoRef.current.load(); }}>
+                    Reintentar
+                  </button>
+                </div>
+              )}
+
               <video
                 ref={videoRef}
                 className="video-element"
                 controls
                 autoPlay
+                preload="metadata"
                 src={streamUrl}
-                onPlay={() => setIsPlaying(true)}
+                onCanPlay={() => setVideoLoading(false)}
+                onPlay={() => { setVideoLoading(false); setIsPlaying(true); }}
                 onPause={() => setIsPlaying(false)}
+                onError={() => {
+                  setVideoLoading(false)
+                  setVideoError(true)
+                }}
               >
                 Tu navegador no soporta streaming.
               </video>

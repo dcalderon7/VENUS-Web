@@ -180,9 +180,13 @@ export function importServerMedia(token, items) {
   })
 }
 
-export function getStreamUrl(mediaId) {
+export function getStreamUrl(mediaId, token) {
   if (!apiUrl) return ''
-  return `${apiUrl}/api/media/${encodeURIComponent(mediaId)}/stream`
+  let url = `${apiUrl}/api/media/${encodeURIComponent(mediaId)}/stream`
+  if (token) {
+    url += `?token=${encodeURIComponent(token)}`
+  }
+  return url
 }
 
 export function uploadMediaFile(token, { file, tmdbId, mediaType = 'movie', displayTitle }, onProgress) {
