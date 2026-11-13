@@ -163,6 +163,23 @@ export function getMediaInfo(token, mediaId) {
   })
 }
 
+export function getImportableFiles(token) {
+  return request('/api/media/import/files', {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+}
+
+export function importServerMedia(token, items) {
+  return request('/api/media/import', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(Array.isArray(items) ? { items } : items),
+  })
+}
+
 export function getStreamUrl(mediaId) {
   if (!apiUrl) return ''
   return `${apiUrl}/api/media/${encodeURIComponent(mediaId)}/stream`

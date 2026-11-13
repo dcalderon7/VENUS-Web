@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { CheckCircle2, Film, HardDrive, Play, RefreshCw, Search, ShieldCheck } from 'lucide-react'
+import { CheckCircle2, Film, HardDrive, Play, Plus, RefreshCw, Search, ShieldCheck } from 'lucide-react'
+import { UploadMediaModal } from '../components/UploadMediaModal'
 import { VideoPlayerModal } from '../components/VideoPlayerModal'
 import { useAuth } from '../context/AuthContext'
 import { getMediaLibrary } from '../services/api'
@@ -16,6 +17,7 @@ export function LibraryPage() {
   const [error, setError] = useState('')
 
   const [playerOpen, setPlayerOpen] = useState(false)
+  const [uploadOpen, setUploadOpen] = useState(false)
   const [currentPlaybackMedia, setCurrentPlaybackMedia] = useState(null)
 
   const loadLibrary = useCallback(async () => {
@@ -129,9 +131,14 @@ export function LibraryPage() {
           <h1>Mi Biblioteca</h1>
           <p>Consulta las películas y archivos disponibles en tu servidor VENUS y reprodúcelos al instante.</p>
         </div>
-        <button className="refresh-button" onClick={loadLibrary} disabled={state === 'loading'}>
-          <RefreshCw size={15} /> Actualizar
-        </button>
+        <div className="header-action-group">
+          <button className="button button--primary" onClick={() => setUploadOpen(true)}>
+            <Plus size={16} /> AGREGAR PELÍCULA
+          </button>
+          <button className="refresh-button" onClick={loadLibrary} disabled={state === 'loading'}>
+            <RefreshCw size={15} /> Actualizar
+          </button>
+        </div>
       </header>
 
       {/* Library Stats */}
@@ -278,6 +285,14 @@ export function LibraryPage() {
         onClose={() => setPlayerOpen(false)}
         media={currentPlaybackMedia}
         title={currentPlaybackMedia?.display_title || tmdbMeta[String(currentPlaybackMedia?.tmdb_id)]?.title}
+      />
+
+      {/* Upload & Server Import Modal */}
+      <UploadMediaModal
+        isOpen={uploadOpen}
+        onClose={() => setUploadOpen(false)}
+        onSuccess={() => loadLibrary()}
+        token={token}
       />
     </div>
   )
