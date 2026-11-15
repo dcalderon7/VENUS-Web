@@ -1,1 +1,1 @@
-https://venus.venus1.workers.dev/
+https://venus-web.venus1.workers.dev
